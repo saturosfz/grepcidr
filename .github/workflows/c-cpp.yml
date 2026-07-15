@@ -1,28 +1,24 @@
-name: C/C++ CI
+name: build
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-22.04-arm
 
     steps:
-    - uses: actions/checkout@v4
-    - name: make
-      run: make
-    # 将编译产物安装到临时目录，方便收集
-    - name: Install to staging directory
-      run: make install DESTDIR=${{ github.workspace }}/install
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    # 上传整个安装目录作为产物（可根据需要精确指定文件）
-    - name: Upload ARM64 artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: arm64-binaries
-        path: ${{ github.workspace }}/install/
-        retention-days: 7   # 保留天数，可按需调整
+      - name: Build
+        run: make
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: .
+          exclude-hidden-files: true
